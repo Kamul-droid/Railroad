@@ -79,45 +79,117 @@ router.get('/login', async(req, res) => {
 
 });
 
-router.get('/', async(req, res) => {
-    return res.send(await userService.getAll());
 
-});
 
 
 
 
 router.use(auth.verifyToken)
-router.put('/update/:id', async(req, res) => {
+
+router.get('/:email', async(req, res) => {
     const userData = req.jwtData;
-    console.log(userData)
-    const u_id = req.params.id;
-    const id = userData.user_id;
-    const body = req.body;
-    console.log(id)
-    console.log(u_id)
-    if (userData.role == "admin") {
-        const canUpdate = userService.canUpdateAccount(body);
-        if (canUpdate == 412) {
+    const u_email = req.params.email;
+    const t_email = userData.user_email;
+    const t_role = userData.user_role;
+    if (t_role == "admin") {
+        return res.send(await userService.getThisUserByEmail(u_email));
+    };
+    if (t_role == "employee") {
+        return res.send(await userService.getThisUserByEmail(u_email));
+    };
 
-        } else if (canUpdate == 4121) {
+    if (t_email == u_email) {
 
-        } else if (canUpdate == 4122) {
+        return res.send(await userService.getThisUserByEmail(u_email));
 
-        } {
-
-        }
-        return res.send(await userService.update(_id, body));
-
-    } else if (id == u_id) {
-
-        return res.send(await userService.update(_id, body));
     } else {
-        return res.status(401)
+        return res.status(401).send('Unauthorized')
     }
 
+});
+router.get('/', async(req, res) => {
+    const all = req.query.allUser
+    const userData = req.jwtData;
+    const t_role = userData.user_role;
+    console.log(t_role)
+    if (t_role == "admin" && all) {
+        return res.send(await userService.getAll());
+    }
+    return res.status(401).send('Unauthorized')
 
+
+});
+
+router.put('/update/:email', async(req, res) => {
+    const userData = req.jwtData;
+    const u_email = req.params.email;
+    const t_email = userData.user_email;
+    const t_role = userData.user_role;
+    const body = req.body;
+
+    if (t_role == "admin") {
+        await verifyAndUpdate(res, body, u_email);
+    };
+
+    if (t_email == u_email) {
+
+        await verifyAndUpdate(res, body, u_email);
+
+    } else {
+        return res.status(401).send('Unauthorized')
+    }
+
+})
+router.delete('/delete/:email', async(req, res) => {
+    const userData = req.jwtData;
+    const u_email = req.params.email;
+    const t_email = userData.user_email;
+
+    if (t_email == u_email) {
+
+        return res.send('Account delete sucessfully');
+    } else {
+        return res.status(401).send('Unauthorized')
+    }
 
 })
 
+async function verifyAndUpdate(res, body, u_email) {
+    const canUpdate = await userService.canUpdateAccount(body);
+    if (canUpdate == 412) {
+        res.status(412).send('Password not valid');
+    } else if (canUpdate == 4121) {
+        const isUniquePseudo = await userService.getThisUserPseudo(body.pseudo)
+
+        if (!isUniquePseudo) {
+            let encodeBodyPass = userService.helper.encodePassword(body);
+            const u = await userService.getThisUserByEmail(u_email);
+            return res.send(await userService.update(u._id, encodeBodyPass));
+
+        } else {
+
+            return res.status(412).send('Pseudo already exist');
+        }
+
+
+    } else if (canUpdate == 4122) {
+        const isUniqueEmail = await userService.getThisUserByEmail(body.email)
+
+        if (!isUniqueEmail) {
+            let encodeBodyPass = userService.helper.encodePassword(body);
+            const u = await userService.getThisUserByEmail(u_email);
+            return res.send(await userService.update(u._id, encodeBodyPass));
+
+        } else {
+
+            return res.status(412).send('Email already exist');
+        }
+
+    } else if (canUpdate) {
+        let encodeBodyPass = userService.helper.encodePassword(body);
+        const u = await userService.getThisUserByEmail(u_email);
+        return res.send(await userService.update(u._id, encodeBodyPass));
+    }
+
+}
 module.exports = router;

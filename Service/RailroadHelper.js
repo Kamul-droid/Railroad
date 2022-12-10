@@ -6,14 +6,17 @@ const saltRounds = 10;
 module.exports = {
     encodePassword: (body) => {
 
+        if (body.password) {
 
-        const salt = bcrypt.genSaltSync(saltRounds);
+            const salt = bcrypt.genSaltSync(saltRounds);
 
-        const hash = bcrypt.hashSync(body.password, saltRounds);
+            const hash = bcrypt.hashSync(body.password, saltRounds);
 
-        body.password = hash;
+            body.password = hash;
 
-        return body;
+            return body;
+        }
+        return 'no password';
     },
     verifyPassword: async(pwd, RetrievePassword) => {
         const rep = bcrypt.compareSync(pwd, RetrievePassword);
@@ -30,7 +33,7 @@ module.exports = {
     createToken: (user, bool) => {
         if (bool) {
             let token = jwt.sign({
-                user_id: user.id,
+                user_email: user.email,
                 user_role: user.role,
             }, jwtKeyStorage.jwtkey);
             jwtKeyStorage.token = token;

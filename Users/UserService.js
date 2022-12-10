@@ -56,16 +56,19 @@ module.exports = {
     },
 
     update: async(_id, _body) => {
-        return await user.findByIdAndUpdate(_id, {..._body });
+        const u = await user.findByIdAndUpdate(_id, {..._body });
+
+        return u;
     },
-    canUpdateAccount: (_body) => {
+    canUpdateAccount: async(_body) => {
         const isGoodPass = helper.checkPasswordValidity(_body.password);
-        const isEmailExist = user.findOne({ 'email': _body.email });
-        const isPseudoExist = user.findOne({ 'pseudo': _body.pseudo });
-        if (isGoodPass) {
+        const isEmailExist = await user.findOne({ 'email': _body.email });
+        const isPseudoExist = await user.findOne({ 'pseudo': _body.pseudo });
+        if (!isGoodPass) {
             return 412
         }
         if (isEmailExist) {
+
             //4121 is a custom code for mail already exist
             return 4121
         }
@@ -74,6 +77,12 @@ module.exports = {
             return 4122
 
         }
+
         return true
     },
+    delete: async(email) => {
+        const u = await user.findOneAndDelete({ 'email': email });
+        return u;
+    },
+    helper: helper,
 }

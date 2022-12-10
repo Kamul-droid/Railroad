@@ -3,6 +3,7 @@ const jwtKeyStorage = require('./env');
 
 const verifyToken = (req, res, next) => {
     // let token = req.get('authorization');
+
     let token = jwtKeyStorage.token;
     console.log(token);
     // req.body.token || req.query.token || req.headers["Authorization"];
@@ -14,7 +15,7 @@ const verifyToken = (req, res, next) => {
 
         const catchToken = token.split(" ")[1];
 
-        const mydecoded = jwt.verify(catchToken, jwtKeyStorage.jwtkey);
+        const mydecoded = jwt.verify(token, jwtKeyStorage.jwtkey);
 
         req.jwtData = mydecoded;
 
