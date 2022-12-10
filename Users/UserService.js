@@ -38,9 +38,15 @@ module.exports = {
             } catch (error) {
                 return 503
             }
-            let encodeBodyPass = helper.encodePassword(body);
-            let userCreated = await user.create(encodeBodyPass);
-            return userCreated;
+            const validUserWithJoi = helper.validateUser(body);
+            if (validUserWithJoi.error) {
+                return 406;
+            } else {
+
+                let encodeBodyPass = helper.encodePassword(body);
+                let userCreated = await user.create(encodeBodyPass);
+                return userCreated;
+            }
         } catch (error) {
 
             return 503;
@@ -64,6 +70,10 @@ module.exports = {
         const isGoodPass = helper.checkPasswordValidity(_body.password);
         const isEmailExist = await user.findOne({ 'email': _body.email });
         const isPseudoExist = await user.findOne({ 'pseudo': _body.pseudo });
+        const u_v = helper.validateUser(_body);
+        if (u_v.error) {
+            return 422
+        }
         if (!isGoodPass) {
             return 412
         }

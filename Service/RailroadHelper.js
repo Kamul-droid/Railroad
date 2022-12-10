@@ -1,4 +1,5 @@
 const bcrypt = require('bcrypt');
+const joi = require('joi')
 const jwt = require('jsonwebtoken');
 const validator = require('password-validator');
 const jwtKeyStorage = require('../Auth/env');
@@ -60,5 +61,28 @@ module.exports = {
         let isValidPass = schema.validate(pwd);
         return isValidPass;
     },
+    validateUser: (user) => {
+        const joiSchema = joi.object({
+            email: joi.string().email().required(),
+            pseudo: joi.string().min(4).max(12).optional(),
+            password: joi.string().min(8).max(12).required(),
+            role: joi.string().min(3).max(12).required(),
+
+
+        }).options({ abortEarly: true });
+        return joiSchema.validate(user);
+    },
+    validateTrainStation: (TrainStation) => {
+        const joiSchema = joi.object({
+            name: joi.string().required(),
+            open_hour: joi.date().iso().required(),
+            close_hour: joi.date().iso().greater(joi.ref('open_hour')).required(),
+            image: joi.any(),
+
+
+        }).options({ abortEarly: true });
+        return joiSchema.validate(TrainStation);
+    },
+
 
 }

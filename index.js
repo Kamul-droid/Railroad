@@ -1,6 +1,7 @@
 const express = require('express');
 const db = require('./Database/connect');
 const user = require('./Users/UserApi');
+const station = require('./TrainStation/TrainStationApi');
 const bodyParser = require('body-parser');
 
 app = express();
@@ -10,6 +11,7 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(bodyParser.json());
 
+app.use('/station', station)
 app.use('/user', user)
 
 
