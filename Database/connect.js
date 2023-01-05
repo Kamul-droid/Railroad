@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const credentials = "mongodb://localhost:27017/";
+const credentials = "mongodb+srv://supinfo:root@cluster0.8kczind.mongodb.net/?retryWrites=true&w=majority";
 mongoose.set('strictQuery', false);
 mongoose.connect(credentials);
 const db = mongoose.connection;

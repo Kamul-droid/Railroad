@@ -2,13 +2,14 @@ const express = require('express');
 const db = require('./Database/connect');
 const user = require('./Users/UserApi');
 const bodyParser = require('body-parser');
-
+const train = require('./Trains/TrainApi')
 app = express();
 
 app.use(bodyParser.urlencoded({
     extended: false
 }));
 app.use(bodyParser.json());
+app.use('/transports', train)
 
 app.use('/user', user)
 
