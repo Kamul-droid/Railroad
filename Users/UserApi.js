@@ -29,11 +29,15 @@ router.post('/register', async(req, res) => {
 
             }
 
-            if (data != 503 && data != 412) {
+            if (data != 503 && data != 412 && data != 406) {
 
                 return res.send(data);
             } else if (data == 412) {
-                return res.status(412).send('Failed password check, You must have at least 1 digit, 1 symbol, no space, Some Uppercase and Lowercase characters and min 8  and max 12 characters')
+                return res.status(412).send('Failed password check,  You must have at least 1 digit, 1 symbol, no space, Some Uppercase and Lowercase characters and min 8  and max 12 characters')
+            } else if (data == 406) {
+
+                return res.status(406).send('Failed data validation, you must send a valid email and your pseudo must have at least 4 characters')
+
             } else if (data == 503) {
 
                 return res.sendStatus(503);
@@ -79,45 +83,125 @@ router.get('/login', async(req, res) => {
 
 });
 
-router.get('/', async(req, res) => {
-    return res.send(await userService.getAll());
 
-});
 
 
 
 
 router.use(auth.verifyToken)
-router.put('/update/:id', async(req, res) => {
+
+router.get('/:email', async(req, res) => {
     const userData = req.jwtData;
-    console.log(userData)
-    const u_id = req.params.id;
-    const id = userData.user_id;
-    const body = req.body;
-    console.log(id)
-    console.log(u_id)
-    if (userData.role == "admin") {
-        const canUpdate = userService.canUpdateAccount(body);
-        if (canUpdate == 412) {
+    const u_email = req.params.email;
+    const t_email = userData.user_email;
+    const t_role = userData.user_role;
+    if (t_role == "admin") {
+        return res.send(await userService.getThisUserByEmail(u_email));
+    };
+    if (t_role == "employee") {
+        return res.send(await userService.getThisUserByEmail(u_email));
+    };
 
-        } else if (canUpdate == 4121) {
+    if (t_email == u_email) {
 
-        } else if (canUpdate == 4122) {
+        return res.send(await userService.getThisUserByEmail(u_email));
 
-        } {
-
-        }
-        return res.send(await userService.update(_id, body));
-
-    } else if (id == u_id) {
-
-        return res.send(await userService.update(_id, body));
     } else {
-        return res.status(401)
+        return res.status(401).send('Unauthorized')
     }
 
+});
+router.get('/', async(req, res) => {
+    const all = req.query.allUser
+    const userData = req.jwtData;
+    const t_role = userData.user_role;
+    console.log(t_role)
+    if (t_role == "admin" && all) {
+        return res.send(await userService.getAll());
+    }
+    return res.status(401).send('Unauthorized')
 
+
+});
+
+router.put('/update/:email', async(req, res) => {
+    const userData = req.jwtData;
+    const u_email = req.params.email;
+    const t_email = userData.user_email;
+    const t_role = userData.user_role;
+    const body = req.body;
+
+    if (t_role == "admin") {
+        await verifyAndUpdate(res, body, u_email);
+    };
+
+    if (t_email == u_email) {
+
+        await verifyAndUpdate(res, body, u_email);
+
+    } else {
+        return res.status(401).send('Unauthorized')
+    }
+
+})
+router.delete('/delete/:email', async(req, res) => {
+    const userData = req.jwtData;
+    const u_email = req.params.email;
+    const t_email = userData.user_email;
+
+    if (t_email == u_email) {
+        const u_e = await userService.getThisUserByEmail(u_email);
+        if (u_e) {
+            const u = await userService.delete(u_email);
+            return res.send('Account delete sucessfully');
+
+        }
+        return res.status(404).send('Account not found');
+    } else {
+        return res.status(401).send('Unauthorized')
+    }
 
 })
 
+async function verifyAndUpdate(res, body, u_email) {
+    const canUpdate = await userService.canUpdateAccount(body);
+    if (canUpdate == 412) {
+        res.status(412).send('Password not valid');
+    } else if (canUpdate == 4121) {
+        const isUniquePseudo = await userService.getThisUserPseudo(body.pseudo)
+
+        if (!isUniquePseudo) {
+            let encodeBodyPass = userService.helper.encodePassword(body);
+            const u = await userService.getThisUserByEmail(u_email);
+            return res.send(await userService.update(u._id, encodeBodyPass));
+
+        } else {
+
+            return res.status(412).send('Pseudo already exist');
+        }
+
+
+    } else if (canUpdate == 4122) {
+        const isUniqueEmail = await userService.getThisUserByEmail(body.email)
+
+        if (!isUniqueEmail) {
+            let encodeBodyPass = userService.helper.encodePassword(body);
+            const u = await userService.getThisUserByEmail(u_email);
+            return res.send(await userService.update(u._id, encodeBodyPass));
+
+        } else {
+
+            return res.status(412).send('Email already exist');
+        }
+
+    } else if (canUpdate == 422) {
+        return res.status(422).send('Failed Entity validation constraints');
+
+    } else if (canUpdate) {
+        let encodeBodyPass = userService.helper.encodePassword(body);
+        const u = await userService.getThisUserByEmail(u_email);
+        return res.send(await userService.update(u._id, encodeBodyPass));
+    }
+
+}
 module.exports = router;

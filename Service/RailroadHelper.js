@@ -1,4 +1,5 @@
 const bcrypt = require('bcrypt');
+const joi = require('joi')
 const jwt = require('jsonwebtoken');
 const validator = require('password-validator');
 const jwtKeyStorage = require('../Auth/env');
@@ -6,14 +7,17 @@ const saltRounds = 10;
 module.exports = {
     encodePassword: (body) => {
 
+        if (body.password) {
 
-        const salt = bcrypt.genSaltSync(saltRounds);
+            const salt = bcrypt.genSaltSync(saltRounds);
 
-        const hash = bcrypt.hashSync(body.password, saltRounds);
+            const hash = bcrypt.hashSync(body.password, saltRounds);
 
-        body.password = hash;
+            body.password = hash;
 
-        return body;
+            return body;
+        }
+        return 'no password';
     },
     verifyPassword: async(pwd, RetrievePassword) => {
         const rep = bcrypt.compareSync(pwd, RetrievePassword);
@@ -30,7 +34,7 @@ module.exports = {
     createToken: (user, bool) => {
         if (bool) {
             let token = jwt.sign({
-                user_id: user.id,
+                user_email: user.email,
                 user_role: user.role,
             }, jwtKeyStorage.jwtkey);
             jwtKeyStorage.token = token;
@@ -57,5 +61,28 @@ module.exports = {
         let isValidPass = schema.validate(pwd);
         return isValidPass;
     },
+    validateUser: (user) => {
+        const joiSchema = joi.object({
+            email: joi.string().email().required(),
+            pseudo: joi.string().min(4).max(12).optional(),
+            password: joi.string().min(8).max(12).required(),
+            role: joi.string().min(3).max(12).required(),
+
+
+        }).options({ abortEarly: true });
+        return joiSchema.validate(user);
+    },
+    validateTrainStation: (TrainStation) => {
+        const joiSchema = joi.object({
+            name: joi.string().required(),
+            open_hour: joi.date().iso().required(),
+            close_hour: joi.date().iso().greater(joi.ref('open_hour')).required(),
+            image: joi.any(),
+
+
+        }).options({ abortEarly: true });
+        return joiSchema.validate(TrainStation);
+    },
+
 
 }
