@@ -20,7 +20,7 @@ const TrainSchema = new mongoose.Schema({
     trim: true 
 },
 time_of_departure: {
-    type: date, 
+    type: Date, 
     required: true, 
     unique: false,
     trim: true 
