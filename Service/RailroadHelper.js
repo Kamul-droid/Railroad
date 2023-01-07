@@ -83,6 +83,17 @@ module.exports = {
         }).options({ abortEarly: true });
         return joiSchema.validate(TrainStation);
     },
+    validateTrain: (Train) => {
+        const joiSchema = joi.object({
+            name: joi.string().required(),
+            start_station: joi.string().required(),
+            end_station: joi.string().required(),
+            time_of_departure: joi.date().iso().required(),
+
+
+        }).options({ abortEarly: true });
+        return joiSchema.validate(Train);
+    },
 
 
 }

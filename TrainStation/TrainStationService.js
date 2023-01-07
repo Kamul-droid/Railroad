@@ -9,7 +9,7 @@ module.exports = {
     },
 
 
-    getTrainStationByName: async() => {
+    getTrainStationSortByName: async() => {
 
         let isuser = await trainStation.find({}).sort({ 'name': -1 });
         return isuser;
@@ -21,12 +21,12 @@ module.exports = {
 
             const validStationWithJoi = helper.validateTrainStation(body);
             if (validStationWithJoi.error) {
-                console.log(validStationWithJoi.error)
+               
                 return 406;
             } else {
 
-                let trainCreated = await trainStation.create(body);
-                return trainCreated;
+                let createdStation = await trainStation.create(body);
+                return createdStation;
             }
         } catch (error) {
 
@@ -52,7 +52,7 @@ module.exports = {
 
         if (isnameExist) {
 
-            //4121 is a custom code for mail already exist
+            //4121 is a custom code for name already exist
             return 412
         }
 

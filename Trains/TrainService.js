@@ -1,8 +1,22 @@
 const Train = require("./Train");
+const helper = require('../Service/RailroadHelper');
 
 module.exports = {
     create : async (_train) =>{
-        return await Train.create(_train)
+        try {
+            const validTrainWithJoi = helper.validateTrain(_train);
+            if (validTrainWithJoi.error) {
+                
+                return 406;
+            } else {
+
+                let trainCreated = await Train.create(_train);
+                return trainCreated;
+            }
+        } catch (error) {
+            
+            return 503;
+        }
     },
     findAll : async () =>{
         return await Train.find()
