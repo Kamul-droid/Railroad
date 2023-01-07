@@ -52,7 +52,7 @@ router.post('/register', async(req, res) => {
     }
 });
 
-router.get('/login', async(req, res) => {
+router.post('/login', async(req, res) => {
     const email = req.query.email;
     const pwd = req.query.password;
     let reqUser;
