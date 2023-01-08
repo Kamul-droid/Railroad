@@ -1,7 +1,9 @@
 const { expect } = require('chai');
 const RailroadHelper = require('../Service/RailroadHelper');
+const TrainService = require('../Trains/TrainService');
 const TrainStationService = require('../TrainStation/TrainStationService');
 const UserService = require('../Users/UserService');
+
 
 
 
@@ -443,6 +445,150 @@ describe('TrainStationService', () => {
         it('return true is station account can be updated base on requirement given the station exist',()=>{
            
             const station =  TrainStationService.canUpdateAccount(this.station);
+            
+            expect( station.then(data =>{
+                data.to.equal(true);
+            }) );
+    
+                   
+        })
+       
+    
+    })
+ })
+describe('TrainService', () => {
+
+    describe('create', () => { 
+        
+        beforeEach(()=>{
+            this.train = {
+                name : "TGV",
+                start_station: "paris",
+                end_station: "paris",
+                time_of_departure: "2022-12-14T10:43:25",
+              };
+
+           
+       
+            
+            
+        })
+        it('return the train created if Train data are correct',()=>{
+           
+            const station =  TrainService.create(this.train);
+            
+            expect( station.then(data =>{ 
+                data.toJSON().to.be.an('object')
+            }));
+    
+                   
+        })
+       
+    
+    })
+    describe('findByName', () => { 
+        
+        beforeEach(()=>{
+            this.train = {
+                name : "TGV",
+                start_station: "paris",
+                end_station: "paris",
+                time_of_departure: "2022-12-14T10:43:25",
+              };
+
+           
+       
+            
+            
+        })
+        it('return the train given a name is provided',()=>{
+           
+            const station =  TrainService.findByName(this.station.name);
+            
+            expect( station.then(data =>{ 
+                data.toJSON().to.be.an('object')
+            }));
+    
+                   
+        })
+       
+    
+    })
+    describe('findTime', () => { 
+        
+        beforeEach(()=>{
+            this.train = {
+                name : "TGV",
+                start_station: "paris",
+                end_station: "paris",
+                time_of_departure: "2022-12-14T10:43:25",
+              };
+
+           
+       
+            
+            
+        })
+        it('return the train based order by time ',()=>{
+           
+            const station =  TrainService.findTime(5);
+            
+            expect( station.then(data =>{ 
+                data.toJSON().to.be.an('object')
+            }));
+    
+                   
+        })
+       
+    
+    })
+   
+    describe('findDepartureGare', () => { 
+        
+        beforeEach(()=>{
+            this.train = {
+                name : "TGV",
+                start_station: "paris",
+                end_station: "paris",
+                time_of_departure: "2022-12-14T10:43:25",
+              };
+
+           
+       
+            
+            
+        })
+        it('return the all the train object given the start station exist',()=>{
+           
+            const station =  TrainService.findDepartureGare(this.train.start_station, 5);
+            
+            expect( station.then(data =>{ 
+                data.toJSON().to.be.an('object')
+            }));
+    
+                   
+        })
+       
+    
+    })
+    describe('findArrivalGare', () => { 
+        
+        beforeEach(()=>{
+            this.train = {
+                name : "TGV",
+                start_station: "paris",
+                end_station: "paris",
+                time_of_departure: "2022-12-14T10:43:25",
+              };
+
+           
+       
+            
+            
+        })
+        it('return all the train which will arrived in  the given station',()=>{
+           
+            const station =  TrainService.findArrivalGare(this.train.end_station,5);
             
             expect( station.then(data =>{
                 data.to.equal(true);

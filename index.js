@@ -10,8 +10,8 @@ app.use(bodyParser.urlencoded({
     extended: false
 }));
 app.use(bodyParser.json());
-app.use('/transports', train)
 
+app.use('/transports', train)
 app.use('/station', station)
 app.use('/user', user)
 

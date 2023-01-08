@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const Train = require('./TrainService')
 const auth = require('../Auth/Auth');
+const trainStationService = require('../TrainStation/TrainStationService')
+
 
 const bodyParser = require('body-parser');
 
@@ -42,8 +44,58 @@ router.post('/train',async(req, res)=>{
     const userData = req.jwtData;
     const t_role = userData.user_role;
 
+   
     if (t_role == "admin") {
-        res.send(await Train.create(req.body))
+        try {
+            const isStartStationExist = await trainStationService.getThisTrainStationByName(req.body.start_station);
+            const isEndStationExist= await trainStationService.getThisTrainStationByName(req.body.end_station);
+           
+            if (isStartStationExist != null && isEndStationExist != null) {
+                let data;
+                //Verify if time of departure is valid based on station open hour
+                const openDate = new Date(isStartStationExist.open_hour);
+                const closeDate = new Date(isStartStationExist.close_hour);
+                const departureDate = new Date(req.body.time_of_departure);
+                
+                if (openDate <= departureDate && departureDate < closeDate) {
+                   
+                    data = await Train.create(req.body);
+                   
+
+                } else {
+                   
+                    return res.status(406).send('Failed data validation, you must send a valid time of departure ISO Date Format ex :YYYY-MM-DDTHH:MM:SS between start station open hour and close hour.');
+
+                    
+                }
+               
+                if (data != 503 && data != 406) {
+
+                    return res.send(data);
+    
+                } else if (data == 406) {
+    
+                    return res.status(406).send('Failed data validation, you must send a valid station name and time in ISO Date Format ex :YYYY-MM-DDTHH:MM:SS.')
+    
+                } else if (data == 503) {
+    
+                    return res.sendStatus(503);
+                }
+               
+                
+            }
+            if (! isStartStationExist ) {
+                return res.status(406).send('Failed data validation, you must send an existing start name station.')
+                
+            }
+            if (! isEndStationExist ) {
+                return res.status(406).send('Failed data validation, you must send an existing end station service name.')
+                
+            }
+        } catch (error) {
+         return res.status(503);
+            
+        }
     }else {
         return res.status(401).send('Unauthorized ! You must be admin.')
     } 
@@ -60,6 +112,10 @@ router.post('/train',async(req, res)=>{
         return res.status(401).send('Unauthorized ! You must be admin.')
     }
 
+})
+
+router.get('/trains/all', async(req, res) =>{
+    res.send(await Train.find());
 })
 
 router.delete('/train/:id',async(req, res)=>{

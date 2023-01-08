@@ -27,6 +27,13 @@ const storage =
     });
 const upload = multer({ storage: storage });
 const fs = require('fs');
+const Train = require('../Trains/TrainService')
+
+
+
+
+
+
 router.get('/', async(req, res) => {
     // const userData = req.jwtData;
     const ts_all = req.query.all;
@@ -46,11 +53,26 @@ router.get('/:station', async(req, res) => {
     // CHANGE THIS IF THE IMAGE YOU ARE WORKING WITH IS .jpg OR WHATEVER
     const mimeType = 'image/png'; // e.g., image/png
 
-    res.send(`<img src="data:${mimeType};base64,${b64}" />`);
-    // res.send(s_s);
+    // res.send(`<img src="data:${mimeType};base64,${b64}" />`);
+    res.send(s_s);
     // res.sendFile(__dirname + '\\images\\ r1.png ');
 });
+
+
 router.use(auth.isAuthorized)
+
+router.get('/', async(req, res) => {
+    const name = req.query.station
+        // const userData = req.jwtData;
+        // const t_role = userData.user_role;
+        // console.log(t_role)
+    if (name) {
+        return res.send(await trainStationService.getThisTrainStationByName(name));
+    }
+    return res.status(400).send('Bad request')
+
+
+});
 
 router.post('/register', upload.single('image'), async(req, res) => {
     const body = req.body;
@@ -79,7 +101,7 @@ router.post('/register', upload.single('image'), async(req, res) => {
 
             } else if (data == 406) {
 
-                return res.status(406).send('Failed data validation, you must send a valid name and time, make sure close hour is greater than open hour')
+                return res.status(406).send('Failed data validation, you must send a valid name and time in ISO Date format ex:YYYY-MM-DDTHH:MM:SS , make sure close hour is greater than open hour')
 
             } else if (data == 503) {
 
@@ -99,19 +121,6 @@ router.post('/register', upload.single('image'), async(req, res) => {
 
 
 
-
-router.get('/', async(req, res) => {
-    const name = req.query.station
-        // const userData = req.jwtData;
-        // const t_role = userData.user_role;
-        // console.log(t_role)
-    if (name) {
-        return res.send(await trainStationService.getThisTrainStationByName(name));
-    }
-    return res.status(400).send('Bad request')
-
-
-});
 
 router.put('/update/:station', async(req, res) => {
     const userData = req.jwtData;
@@ -136,10 +145,21 @@ router.delete('/delete/:station', async(req, res) => {
         const s = await trainStationService.getThisTrainStationByName(station);
         if (s) {
             //Find all the train related to station and delete them first
+            const allTrainArr = await Train.findAllTrainUsingThisGareForArr(station ); 
+            allTrainArr.forEach(train => {
+                Train.delete(train);
+            });
+            const allTrainDep = await Train.findAllTrainUsingThisGareForDep(station ); 
+             
+          
+            allTrainDep.forEach(train => {
+                Train.delete(train);
+            });
+           
             const t = await trainStationService.delete(station);
             return res.send('Account delete sucessfully');
         }
-        return res.status(404).send('Account doesn \'t exist');
+        return res.status(404).send('This station doesn \'t exist');
 
     } else {
         return res.status(401).send('Unauthorized')

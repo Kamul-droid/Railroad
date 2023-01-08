@@ -35,6 +35,10 @@ module.exports = {
         }
         return result
     },
+    find : async () =>{
+       
+        return await Train.find();
+    },
     findByName : async(_name,_i) =>{
         var result = []
         if (_i != null){
@@ -113,4 +117,18 @@ module.exports = {
         }
         return result
     },
+
+    findAllTrainUsingThisGareForDep: async(_gare)=>{
+       
+        res = await Train.find({start_station:_gare })
+       
+        return res;
+    },
+
+    findAllTrainUsingThisGareForArr: async(_gare)=>{
+            
+        res = await Train.find({ end_station:_gare })
+     
+        return res;
+    }
 }
