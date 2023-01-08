@@ -19,7 +19,7 @@ router.get('/trains', async(req, res) =>{
 
 router.get('/departure', async(req, res) =>{ 
 
-    res.send(await Train.findTrain());
+    res.send(await Train.findTime());
 })
 
 
