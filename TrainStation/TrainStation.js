@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-const userSchema = new mongoose.Schema({
+const trainStationSchema = new mongoose.Schema({
     name: String,
     open_hour: String,
     close_hour: String,
@@ -9,4 +9,4 @@ const userSchema = new mongoose.Schema({
     },
 
 })
-module.exports = mongoose.model('TrainStation', userSchema)
+module.exports = mongoose.model('TrainStation', trainStationSchema)

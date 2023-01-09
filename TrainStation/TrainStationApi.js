@@ -36,6 +36,7 @@ const Train = require('../Trains/TrainService')
 
 router.get('/', async(req, res) => {
     // const userData = req.jwtData;
+    // get all station with query parameter all = true
     const ts_all = req.query.all;
     if (ts_all) {
 
@@ -53,19 +54,17 @@ router.get('/:station', async(req, res) => {
     // CHANGE THIS IF THE IMAGE YOU ARE WORKING WITH IS .jpg OR WHATEVER
     const mimeType = 'image/png'; // e.g., image/png
 
-    // res.send(`<img src="data:${mimeType};base64,${b64}" />`);
+    
     res.send(s_s);
-    // res.sendFile(__dirname + '\\images\\ r1.png ');
 });
 
 
 router.use(auth.isAuthorized)
 
 router.get('/', async(req, res) => {
+    // get the station info with query parameter station="station name"
     const name = req.query.station
-        // const userData = req.jwtData;
-        // const t_role = userData.user_role;
-        // console.log(t_role)
+       
     if (name) {
         return res.send(await trainStationService.getThisTrainStationByName(name));
     }
@@ -89,9 +88,8 @@ router.post('/register', upload.single('image'), async(req, res) => {
 
         let data;
         if (!isNameExist) {
-            body.image = final_img; //fs.readFileSync(path.join(__dirname + '/images/' + req.file.filename));
-            // body.image.contentType = 'image/png';
-
+            body.image = final_img;
+            
             data = await trainStationService.createTrainStation(body);
 
 
