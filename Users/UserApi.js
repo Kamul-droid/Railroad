@@ -90,6 +90,28 @@ router.post('/login', async(req, res) => {
 
 router.use(auth.verifyToken)
 
+router.post('/getDailyTicket/:email',async (req,res)=>{
+    const body = req.body
+    const userData = req.jwtData;
+    const u_email = req.params.email;
+    const t_email = userData.user_email;
+  
+
+    if (t_email == u_email) {
+        if (body.price == 10) {
+            return res.send("You got a ticket for 24h ");
+            
+        } else {
+            
+            return res.send("You can only paid the ticket for 10 Euro");
+        }
+
+    } else {
+        return res.status(401).send('Unauthorized')
+    }
+
+});
+
 router.get('/:email', async(req, res) => {
     const userData = req.jwtData;
     const u_email = req.params.email;
