@@ -144,6 +144,21 @@ router.put('/update/:email', async(req, res) => {
     }
 
 })
+router.put('/update/role/:email', async(req, res) => {
+    const userData = req.jwtData;
+    const u_email = req.params.email;
+    const t_role = userData.user_role;
+    const newRole = req.query.role;
+   
+
+    if (t_role == "admin") {
+        await verifyAndUpdateRole(res, newRole, u_email);
+    
+    } else {
+        return res.status(401).send('Unauthorized')
+    }
+
+})
 router.delete('/delete/:email', async(req, res) => {
     const userData = req.jwtData;
     const u_email = req.params.email;
@@ -202,6 +217,20 @@ async function verifyAndUpdate(res, body, u_email) {
         const u = await userService.getThisUserByEmail(u_email);
         return res.send(await userService.update(u._id, encodeBodyPass));
     }
+
+}
+async function verifyAndUpdateRole(res, newRole, u_email) {
+    
+    const user = await userService.getThisUserByEmail(u_email)
+    if (user) {
+        user.role = newRole;
+        return res.send(await userService.update(user._id, user));
+        
+    } else {
+        return res.status(412).send('this account doesn\'t exist ');
+        
+    }
+
 
 }
 module.exports = router;

@@ -32,6 +32,7 @@ const Train = require('../Trains/TrainService')
 
 
 
+router.use(auth.isAuthorized)
 
 
 router.get('/', async(req, res) => {
@@ -40,7 +41,7 @@ router.get('/', async(req, res) => {
     const ts_all = req.query.all;
     if (ts_all) {
 
-        return res.send(await trainStationService.getTrainStationByName());
+        return res.send(await trainStationService.getAll());
     }
     return res.status(400).send('Bad request');
 
@@ -59,7 +60,7 @@ router.get('/:station', async(req, res) => {
 });
 
 
-router.use(auth.isAuthorized)
+
 
 router.get('/', async(req, res) => {
     // get the station info with query parameter station="station name"

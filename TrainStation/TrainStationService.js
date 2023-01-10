@@ -43,7 +43,8 @@ module.exports = {
     },
 
     update: async(_id, _body) => {
-        const u = await trainStation.findByIdAndUpdate(_id, {..._body });
+        const _u = await trainStation.findByIdAndUpdate(_id, {..._body });
+        const u = await trainStation.findById(_id);
 
         return u;
     },

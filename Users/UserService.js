@@ -10,13 +10,13 @@ module.exports = {
 
     getThisUserEmail: async(mail) => {
 
-        let isuser = await user.findOne({ 'email': mail });
-        return isuser;
+        let isUser = await user.findOne({ 'email': mail });
+        return isUser;
     },
     getThisUserPseudo: async(pseudo) => {
 
-        let isuser = await user.findOne({ 'pseudo': pseudo });
-        return isuser;
+        let isUser = await user.findOne({ 'pseudo': pseudo });
+        return isUser;
     },
     checkCredentials: async(_retrievePass, _pwd) => {
 
@@ -63,8 +63,9 @@ module.exports = {
 
     update: async(_id, _body) => {
         const u = await user.findByIdAndUpdate(_id, {..._body });
+        const afterUpdate = await user.findById(_id);
 
-        return u;
+        return afterUpdate;
     },
     canUpdateAccount: async(_body) => {
         const isGoodPass = helper.checkPasswordValidity(_body.password);
