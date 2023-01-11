@@ -49,7 +49,7 @@ router.post('/train',async(req, res)=>{
         try {
             const isStartStationExist = await trainStationService.getThisTrainStationByName(req.body.start_station);
             const isEndStationExist= await trainStationService.getThisTrainStationByName(req.body.end_station);
-           
+          
             if (isStartStationExist != null && isEndStationExist != null) {
                 let data;
                 //Verify if time of departure is valid based on station open hour
@@ -130,5 +130,9 @@ router.delete('/train/:id',async(req, res)=>{
 
 
 })
+
+router.get('*', function(req, res){
+    res.status(400).send('what??? this route doesn\'t exist');
+  });
 
 module.exports = router;

@@ -51,12 +51,17 @@ router.get('/', async(req, res) => {
 router.get('/:station', async(req, res) => {
     const s = req.params.station;
     const s_s = await trainStationService.getThisTrainStationByName(s)
-    const b64 = Buffer.from(s_s.image.data).toString('base64');
-    // CHANGE THIS IF THE IMAGE YOU ARE WORKING WITH IS .jpg OR WHATEVER
-    const mimeType = 'image/png'; // e.g., image/png
+    if (s_s) {
+        const b64 = Buffer.from(s_s.image.data).toString('base64');
+        // CHANGE THIS IF THE IMAGE YOU ARE WORKING WITH IS .jpg OR WHATEVER
+        const mimeType = 'image/png'; // e.g., image/png
+        res.send(s_s);
+        
+    } else {
+        res.status(404).send(`No station with name: `+ s +` doesn\'t exist`);
+    }
 
     
-    res.send(s_s);
 });
 
 
@@ -165,6 +170,11 @@ router.delete('/delete/:station', async(req, res) => {
     }
 
 })
+
+router.get('*', function(req, res){
+    res.status(400).send('what??? this route doesn\'t exist');
+  });
+  
 
 async function verifyAndUpdate(res, body, station) {
     const canUpdate = await trainStationService.canUpdateAccount(body);

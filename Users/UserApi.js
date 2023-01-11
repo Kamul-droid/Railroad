@@ -133,11 +133,42 @@ router.get('/:email', async(req, res) => {
     }
 
 });
+
+router.get('/validate/:ticket', async(req, res) => {
+    const userData = req.jwtData;
+    const isGoodTicket = req.query.code
+    const t_role = userData.user_role;
+  
+    const ticketList = ['paris2023-01-01-14-12-45','paris2023-01-21-14-12-45','paris2023-02-01-14-12-45']
+    if (t_role == "admin" || t_role == "employee" ) {
+        let bool = false;
+        ticketList.map(ticket =>{
+            if (isGoodTicket == ticket) {
+               bool = true; 
+            } 
+            
+        });
+        if (bool) {
+            return res.status(200).send("Valid ticket");
+            
+        } else {
+            
+            return res.status(200).send("Invalid ticket");
+        }
+
+    } else {
+        return res.status(401).send('Unauthorized')
+    }
+
+});
+
+
 router.get('/', async(req, res) => {
+    // work with query allUser = true
     const all = req.query.allUser
     const userData = req.jwtData;
     const t_role = userData.user_role;
-    console.log(t_role)
+   
     if (t_role == "admin" && all) {
         return res.send(await userService.getAll());
     }
@@ -199,6 +230,10 @@ router.delete('/delete/:email', async(req, res) => {
     }
 
 })
+
+router.get('*', function(req, res){
+    res.status(400).send('what??? this route doesn\'t exist');
+  });
 
 async function verifyAndUpdate(res, body, u_email) {
     const canUpdate = await userService.canUpdateAccount(body);

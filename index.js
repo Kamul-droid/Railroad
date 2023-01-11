@@ -14,6 +14,9 @@ app.use(bodyParser.json());
 app.use('/transports', train)
 app.use('/station', station)
 app.use('/user', user)
+app.get('*', function(req, res){
+    res.status(400).send('what??? this route doesn\'t exist');
+  });
 
 
 app.listen(3000, () => {
