@@ -1,0 +1,777 @@
+openapi: 3.0.3
+info:
+  title: RailRoad - API 
+  version: 1.0.0 
+  description: |-
+  
+    RailRoad Ltd is a company that aims to produce the best experience for your local and national travel. This API was built to allow different users to access line information or other relevant data.
+
+    Some useful links:
+    - [Github Railroad Project](https://github.com/Kamul-droid/Railroad)
+    - [The subject of project Railroad](https://canvas.supinfo.com/courses/507/assignments/6666?module_item_id=9557)
+servers:
+  - url: http://localhost:3000
+tags:
+  - name: Trains
+    description: Check the different trains.
+  - name: Users
+    description: User data.
+  - name: Train station
+    description: Check the different stations.
+paths:
+  /transports/trains:
+    get:
+      tags:
+        - Trains
+      summary: View all trains
+      description: Display all train informations (default display 10 trains).
+      operationId: findAll
+      parameters:
+        - name: filter
+          in: query
+          description: Number of train to return
+          required: false
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Train'
+        '401':
+          description: Invalid token authentification
+        '503':
+          description: Service unavailable.
+
+  /transports/train/name/{name}:
+    get:
+      tags:
+        - Trains
+      summary: Search for a train by entering its name.
+      description: Retrieve the informations of a train by entering its name (default display 10 trains).
+      operationId: findByName
+      parameters:
+        - name: name
+          in: path
+          description: Name of train to return
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: filter
+          in: query
+          description: Number of train to return
+          required: false
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Train'          
+        '401':
+          description: Invalid token authentification
+        '404':
+          description: Train not found.
+        '503':
+          description: Service unavailable.
+
+            
+            
+  /transports/train/id/{_id}:
+    get:
+      tags:
+        - Trains
+      summary: Search for a train by entering its ID.
+      description: Retrieve the informations of a train by entering its ID (default display 10 trains).
+      operationId: findById
+      parameters:
+        - name: _id
+          in: path
+          description: ID of train to return
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: filter
+          in: query
+          description: Number of train to return
+          required: false
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Train'          
+        '401':
+          description: Invalid token authentification
+        '404':
+          description: Train not found.
+        '503':
+          description: Service unavailable.
+
+            
+  /transports/train/departure/{start_station}:
+    get:
+      tags:
+        - Trains
+      summary: Filter trains by station of departure.
+      description: Filter trains display by station of departure (default display 10 trains).
+      operationId: findDepartureStation
+      parameters:
+        - name: start_station
+          in: path
+          description: Start station of train to return
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: filter
+          in: query
+          description: Number of train to return
+          required: false
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Train'          
+        '401':
+          description: Invalid token authentification
+        '404':
+          description: Train not found.
+        '503':
+          description: Service unavailable.
+
+            
+            
+  /transports/train/arrival/{end_station}:
+    get:
+      tags:
+        - Trains
+      summary: Filter trains by arrival station.
+      description: Filter trains display by arrival station (default display 10 trains).
+      operationId: findArrivalStation
+      parameters:
+        - name: end_station
+          in: path
+          description: End station of train to return
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: filter
+          in: query
+          description: Number of train to return
+          required: false
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Train'          
+        '401':
+          description: Invalid token authentification
+        '404':
+          description: Train not found.
+        '503':
+          description: Service unavailable.
+
+            
+  /transports/train/schedule:
+    get:
+      tags:
+        - Trains
+      summary: Filter trains by date.
+      description: Filter trains by date (default display 10 trains).
+      operationId: findTime
+      parameters:
+        - name: filter
+          in: query
+          description: Number of train to return
+          required: false
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Train'          
+        '401':
+          description: Invalid token authentification
+        '503':
+          description: Service unavailable.
+
+ 
+  /transports/train:
+    post:
+      tags:
+        - Trains
+      summary: Add a new train
+      description: Add a new train set.
+      operationId: create
+      requestBody:
+        description: Add a new train line to the database.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Train'
+  
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Train'        
+        '401':
+          description: Unauthorized ! You must be admin.
+        '406':
+          description: Not acceptable ! The body does not respect the conditions
+        '503':
+          description: Service unavailable.
+
+
+  /transports/train/{_id}:
+    put:
+      tags:
+        - Trains
+      summary: modify a train set. 
+      description: modify informations of train
+      operationId: updateName
+      parameters:
+        - name: _id
+          in: path
+          description: ID of train to return
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: Enter your modifications
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Train'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Train'          
+        '401':
+          description: Unauthorized ! You must be admin.
+        '404':
+          description: Train not found.
+        '406':
+          description: Not acceptable ! The body does not respect the conditions.
+        '503':
+          description: Service unavailable.
+
+
+    delete:
+      tags:
+        - Trains
+      summary: delete train
+      description: delete a train set permanently 
+      operationId: delete
+      parameters:
+        - name: _id
+          in: path
+          description: ID of train to return
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Train'      
+        '401':
+          description: Unauthorized ! You must be admin.
+        '404':
+          description: Train not found.
+        '503':
+          description: Service unavailable.
+
+
+  /user/register:
+    post:
+      tags:
+        - Users
+      summary: Create user
+      description: Create a new user.
+      operationId: createUser
+      requestBody:
+        description: Created user object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      responses:
+        '200':
+          description: successfully authenticated !
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'    
+  
+        '409':
+          description: There is a conflict, pseudo or email already exist.
+        '412':
+          description: Failed password check,  You must have at least 1 digit, 1 symbol, no space, Some Uppercase and Lowercase characters and min 8  and max 12 characters.
+        '503':
+          description: Service unavailable.
+
+
+            
+  /user/login:
+    post:
+      tags:
+        - Users
+      summary: Login 
+      description: Login to your account.
+      operationId: login
+      parameters:
+        - name: email
+          in: query
+          description: fill in the email
+          required: true
+          schema:
+            type: string
+        - name: password
+          in: query
+          description: fill in the password
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successfully authenticated !
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'          
+        '409':
+          description: Use another email.
+        '400':
+          description: Wrong password.
+        '404':
+          description: No account exist with this email.
+        '503':
+          description: Service unavailable.
+          
+  /user/getDailyTicket/{email}:
+    post:
+      tags:
+        - Users
+      summary: Buy a ticket 
+      description: Buy a ticket for 24h.
+      operationId: buyTicket
+      parameters:
+        - name: email
+          in: path
+          description: fill in the email
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successfully authenticated !
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User' 
+        '401':
+          description: Invalid token authentification
+        '409':
+          description: Use another email.
+        '404':
+          description: No account exist with this email.
+        '503':
+          description: Service unavailable.
+            
+  /user/{email}:
+    get:
+      tags:
+        - Users
+      summary: My account
+      description: Show my informations
+      operationId: getThisUser
+      parameters:
+        - name: email
+          in: path
+          description: fill in the email
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'          
+        '401':
+          description: Invalid token authentification
+        '404':
+          description: Account not found.
+        '503':
+          description: Service unavailable.
+            
+  /user:
+    get:
+      tags:
+        - Users
+      summary: Get all users
+      description: Get all users informations with query allUser=true
+      operationId: getAllUser=true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'          
+        '401':
+          description: Invalid token authentification
+        '503':
+          description: Service unavailable.
+          
+  /user/validate/ticket{code}:
+    get:
+      tags:
+        - Ticket
+      summary: Validate a ticket of user
+      description: Employee and admin can validate ticket with a query parameter code=ticketinfo
+      operationId: code=ticket
+      parameters:
+        - name: code
+          in: path
+          description: fill in the code
+          required: true
+          schema:
+            type: string
+       
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Valid Ticket
+              
+        '401':
+          description: Invalid token authentification
+        
+  /user/update/{email}:
+    put:
+      tags:
+        - Users
+      summary: Update user informations
+      description: modify informations of user
+      operationId: updateAccount
+      parameters:
+        - name: email
+          in: path
+          description: fill in the email
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Enter your modifications
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'          
+        '401':
+          description: Unauthorized ! You must be admin.
+        '404':
+          description: Account not found.
+        '412':
+          description: Precondition failed, not respect the conditions.
+        '422':
+          description: Account not found.
+        '503':
+          description: Service unavailable.
+
+    delete:
+      tags:
+        - Users
+      summary: Delete an user
+      description: Remove permanently a user
+      operationId: deleteAccount
+      parameters:
+        - name: email
+          in: path
+          description: Email of user to return
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'          
+        '401':
+          description: Unauthorized ! You must be admin.
+        '404':
+          description: Account not found.
+        '503':
+          description: Service unavailable.
+            
+  /station:
+    get:
+      tags:
+        - Train station
+      summary: Get all Trains stations
+      description: Get all informations about trains stations.
+      operationId: getAllStation
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Station'
+        '400':
+          description: Bad request
+        '401':
+          description: Invalid token authentification
+        '503':
+          description: Service unavailable.
+
+            
+  /station/{station}:
+    get:
+      tags:
+        - Train station
+      summary: Get a station
+      description: Get informations about a train station.
+      operationId: getTrainStationByName
+      parameters:
+        - name: station
+          in: path
+          description: name of station to return
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Station'          
+        '401':
+          description: Invalid token authentification
+        '404':
+          description: Train station not found.
+        '503':
+          description: Service unavailable.
+
+  /station/register:
+    post:
+      tags:
+        - Train station
+      summary: Add a new train station
+      description: Add new train station in database.
+      operationId: createTrainStation
+      requestBody:
+        description: Create a new train station
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Station'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Station'          
+        '401':
+          description: Unauthorized ! You must be admin.
+        '406':
+          description: Failed data validation, you must send a valid name and time in ISO Date format ex:YYYY-MM-DDTHH:MM:SS , make sure close hour is greater than open hour.
+        '409':
+          description: There is a conflict, This name already exist
+        '503':
+          description: Service unavailable.
+
+  /station/update/{station}:
+    put:
+      tags:
+        - Train station
+      summary: Update train station informations
+      description: Update informations of a train station.
+      operationId: canUpdateStation
+      parameters:
+        - name: station
+          in: path
+          description: Name of station to return
+          required: true
+          schema:
+            type: string
+            
+      requestBody:
+        description: Enter your modifications
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Station'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Station'          
+        '401':
+          description: Unauthorized ! You must be admin.
+        '404':
+          description: Train station not found.
+        '503':
+          description: Service unavailable.
+            
+            
+            
+            
+  /station/delete/{station}:
+    delete:
+      tags:
+        - Train station
+      summary: Delete a train station.
+      description: Remove permanently a train station.
+      operationId: deleteStation
+      parameters:
+        - name: station
+          in: path
+          description: Name of station to return
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Station'          
+        '401':
+          description: Unauthorized ! You must be admin.
+        '404':
+          description: Train station not found.
+        '503':
+          description: Service unavailable.
+          
+components:
+  schemas:
+    Train:
+      required:
+        - name
+        - start_station
+        - end_station
+        - time_of_departure
+      type: object
+      properties:
+        name:
+          type: string
+          example: petit express
+        start_station:
+          type: string
+          example: Paris
+        end_station:
+          type: string
+          example: Marseille
+        time_of_departure:
+          type: string
+          format: date-time
+          example: '2020-06-01T18:30:00.000+00:00'
+          
+    User:
+      type: object
+      properties:
+        email:
+          type: string
+          example: john@email.com
+        pseudo:
+          type: string
+          example: theUser
+        password:
+          type: string
+          example: 'JohnD@e123'
+        role:
+          type: string
+          example: user
+          
+    Station:
+      type: object
+      properties:
+        name:
+          type: string
+          example: marseille
+          
+        open_hour:
+          type: string
+          example: '07h30'
+          
+        close_hour:
+          type: string
+          example: '18h00'
+        
+        image:
+          type: object
+          format: binary
+  
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+  
